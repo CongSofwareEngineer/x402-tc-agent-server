@@ -11,17 +11,17 @@ const siteUrl =
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: "KEYRING AGENT",
-  description: "Your DeFi Assistant",
+  title: "CHAIN VAULT API",
+  description: "Blockchain Gateway Service",
   openGraph: {
-    title: "KEYRING AGENT",
-    description: "Your DeFi Assistant",
+    title: "CHAIN VAULT API",
+    description: "Blockchain Gateway Service",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "KEYRING AGENT",
-    description: "Your DeFi Assistant",
+    title: "CHAIN VAULT API",
+    description: "Blockchain Gateway Service",
   },
 };
 

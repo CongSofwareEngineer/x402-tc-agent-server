@@ -8,7 +8,7 @@ export default function Home() {
       <meta httpEquiv="refresh" content={`0; url=${DESTINATION}`} />
       <main>
         <p>
-          Redirecting to <a href={DESTINATION}>keyring.app</a>…
+          Redirecting to <a href={DESTINATION}>chainvault.example</a>…
         </p>
       </main>
     </>

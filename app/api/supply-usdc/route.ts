@@ -7,10 +7,10 @@ export const runtime = "nodejs";
 
 // The paid business logic for a supply-usdc (lending-market deposit) action.
 // Only runs after a valid x402 payment is verified by the facilitator, so
-// reaching this line means the fee has been settled.
+// reaching this line means the gateway fee has been settled.
 //
-// The response body is a small JSON receipt: the client treats it as "the fee is
-// paid, you may now broadcast the supply tx" — and nothing else. This endpoint
+// The response body is a small JSON receipt: the client treats it as "the gateway fee is
+// covered, you may now broadcast the deposit tx" — and nothing else. This endpoint
 // does NOT touch the chain and never sees the user's transaction: the wallet
 // builds, signs and broadcasts that itself.
 const handler = async (_req: NextRequest) => {

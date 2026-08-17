@@ -10,38 +10,38 @@ const PAID_ROUTES = [
   {
     path: "/api/send-token",
     operationId: "sendToken",
-    summary: "Send Token — pay the ERC-20 transfer execution fee",
-    description: "Pay the execution fee for an ERC-20 token transfer.",
+    summary: "Send Token — cover the ERC-20 dispatch gateway fee",
+    description: "Cover the gateway fee for an ERC-20 token dispatch.",
     price: PRICES_USD["send-token"],
   },
   {
     path: "/api/send-native",
     operationId: "sendNative",
-    summary: "Send Native — pay the native coin transfer execution fee",
-    description: "Pay the execution fee for a native coin transfer.",
+    summary: "Send Native — cover the native coin dispatch gateway fee",
+    description: "Cover the gateway fee for a native coin dispatch.",
     price: PRICES_USD["send-native"],
   },
   {
     path: "/api/send-nft",
     operationId: "sendNft",
-    summary: "Send NFT — pay the ERC-721/1155 transfer execution fee",
-    description: "Pay the execution fee for an NFT (ERC-721/1155) transfer.",
+    summary: "Send NFT — cover the ERC-721/1155 dispatch gateway fee",
+    description: "Cover the gateway fee for an NFT (ERC-721/1155) dispatch.",
     price: PRICES_USD["send-nft"],
   },
   {
     path: "/api/add-pool",
     operationId: "addPool",
-    summary: "Add Pool — pay the Uniswap V3 add-liquidity execution fee",
+    summary: "Add Pool — cover the Uniswap V3 liquidity-injection gateway fee",
     description:
-      "Pay the execution fee for adding liquidity to a Uniswap V3 pool.",
+      "Cover the gateway fee for injecting liquidity into a Uniswap V3 pool.",
     price: PRICES_USD["add-pool"],
   },
   {
     path: "/api/supply-usdc",
     operationId: "supplyUsdc",
-    summary: "Supply USDC — pay the lending-market supply execution fee",
+    summary: "Supply USDC — cover the lending-market deposit gateway fee",
     description:
-      "Pay the execution fee for supplying USDC to a lending market.",
+      "Cover the gateway fee for depositing USDC into a lending market.",
     price: PRICES_USD["supply-usdc"],
   },
 ] as const;
@@ -56,7 +56,7 @@ function paidOperation(route: (typeof PAID_ROUTES)[number]) {
     get: {
       operationId: route.operationId,
       summary: route.summary,
-      description: `${route.description} Paid in ${PAY_LABEL}.`,
+      description: `${route.description} Settled via ${PAY_LABEL}.`,
       "x-payment-info": {
         // amount is decimal USD here; the runtime 402 quotes atomic units.
         price: { mode: "fixed", currency: "USD", amount: route.price },
@@ -75,7 +75,7 @@ function paidOperation(route: (typeof PAID_ROUTES)[number]) {
       },
       responses: {
         "200": {
-          description: "Fee settled",
+          description: "Gateway fee cleared",
           content: {
             "application/json": {
               schema: {
@@ -121,24 +121,24 @@ export async function GET(req: NextRequest) {
   const doc = {
     openapi: "3.1.0",
     info: {
-      title: "x402 KEYRING AGENT Server",
+      title: "CHAIN VAULT Gateway Server",
       version: "1.0.0",
       description:
-        "Agent-native wallet-action paywall. Pay-per-call with USDC on Base " +
-        "over the x402 protocol. No accounts or API keys required.",
+        "Agent-native blockchain-action paywall. Pay-per-call with USDC on Ethereum L2 " +
+        "through the x402 protocol. No accounts or API keys required.",
       // High-level guidance x402scan surfaces to agents browsing the API.
       // Phrased about the paywall in general, not any one route family, so it
       // stays correct as endpoints are added — see each operation's summary and
       // x-payment-info for what a specific route does and costs.
       "x-guidance":
-        "Every paid endpoint charges a fixed execution fee via x402 (USDC on " +
-        "Base): pay the 402 challenge and the call settles. The routes take no " +
-        "transfer details and never touch the chain — the caller broadcasts the " +
-        "transfer itself. See each operation for its price and behavior.",
-      contact: { email: "info@bacoor.co" },
+        "Every paid endpoint charges a fixed gateway fee via x402 (USDC on " +
+        "Ethereum L2): settle the 402 challenge and the call completes. The routes take " +
+        "no transfer details and never touch the chain — the caller broadcasts the " +
+        "action itself. See each operation for its price and behavior.",
+      contact: { email: "ops@chainvault.example" },
       "x-logo": {
         url: `${origin}/favicon.ico`,
-        altText: "x402 KEYRING AGENT Server",
+        altText: "CHAIN VAULT Gateway Server",
       },
     },
     servers: [{ url: origin }],

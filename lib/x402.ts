@@ -5,52 +5,52 @@ import type { Address } from "viem";
 
 type Network = `${string}:${string}`;
 
-// Base mainnet (CAIP-2). Payments settle in USDC here, via the CDP facilitator
-// that createX402Server wires up automatically — there is no facilitator URL or
-// bearer token to configure.
+// Base mainnet (CAIP-2). Payments settle in USDC here, via the Coinbase CDP
+// facilitator that createX402Server wires up automatically — there is no
+// facilitator URL or bearer token to configure.
 export const NETWORK = "eip155:8453";
 
 // EVM account that receives the payments. payToConfig.type "address" means CDP
 // does NOT provision a wallet for us: funds go straight to this address and no
-// CDP_WALLET_SECRET is needed — only the API key pair for the facilitator.
+// wallet secret is needed — only the API key pair for the facilitator.
 const payTo = process.env.EVM_ADDRESS as Address | undefined;
 if (!payTo) {
   throw new Error(
-    "EVM_ADDRESS environment variable is required (your Base payout address, 0x…)",
+    "EVM_ADDRESS environment variable is required (your Base payout address, 0x...)",
   );
 }
 if (!/^0x[a-fA-F0-9]{40}$/.test(payTo)) {
   throw new Error(
-    `EVM_ADDRESS must be an EVM address (0x… , 42 chars), got: ${payTo}`,
+    `EVM_ADDRESS must be an EVM address (0x..., 42 chars), got: ${payTo}`,
   );
 }
 export const payToAddress: Address = payTo;
 
 // Per-route price, in USD. Shared with the OpenAPI doc so discovery and the 402
-// challenge agree. The three routes are the same paywall over three different
+// challenge agree. The five routes are the same paywall over five different
 // wallet actions, priced by how much value each one moves.
 export const PRICES_USD = {
-  "send-nft": "0.05",
-  "send-token": "0.05",
-  "send-native": "0.05",
-  "add-pool": "3",
+  "send-nft": "0.01",
+  "send-token": "0.01",
+  "send-native": "0.01",
+  "add-pool": "0.01",
   "supply-usdc": "0.01",
 } as const;
 
 // Human-readable label for the one payment option we accept. The OpenAPI doc
 // renders this; keep it in step with NETWORK.
-export const PAY_LABEL = "USDC on Base";
+export const PAY_LABEL = "USDC on Ethereum L2";
 
 // Human-readable purpose of each paid route, used for the route description the
 // 402 challenge carries. Keyed the same as PRICES_USD so the two stay in step.
 const DESCRIPTIONS = {
-  "send-token": "Pay the send-token execution fee (ERC-20 transfer)",
-  "send-native": "Pay the send-native execution fee (native coin transfer)",
-  "send-nft": "Pay the send-nft execution fee (ERC-721/1155 transfer)",
+  "send-token": "Cover the send-token gateway fee (ERC-20 token dispatch)",
+  "send-native": "Cover the send-native gateway fee (native coin dispatch)",
+  "send-nft": "Cover the send-nft gateway fee (ERC-721/1155 token dispatch)",
   "add-pool":
-    "Pay the add-pool execution fee (add liquidity to a Uniswap V3 pool)",
+    "Cover the add-pool gateway fee (inject liquidity into a Uniswap V3 pool)",
   "supply-usdc":
-    "Pay the supply-usdc execution fee (supply USDC to a lending market)",
+    "Cover the supply-usdc gateway fee (deposit USDC into a lending market)",
 } as const satisfies Record<keyof typeof PRICES_USD, string>;
 
 // Discovery metadata for one paid route, in the Bazaar extension shape that
@@ -102,7 +102,7 @@ function bazaarDeclaration() {
           status: {
             type: "string",
             enum: ["ok"],
-            description: "ok once the execution fee is settled",
+            description: "confirmed once the gateway fee has been cleared",
           },
         },
         required: ["status"],

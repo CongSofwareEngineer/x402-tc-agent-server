@@ -1,6 +1,6 @@
-# x402 Server
+# Pay-Per-Call API Gateway
 
-A Next.js (App Router) API that charges per call using the [x402](https://docs.x402.org) payment protocol.
+A Next.js (App Router) API that charges per request using the [x402](https://docs.x402.org) payment protocol.
 
 - **Price:** `$0.01` – `$0.03` USDC · **Network:** Base mainnet (`eip155:8453`) · **Facilitator:** Coinbase CDP
 
@@ -10,18 +10,18 @@ A Next.js (App Router) API that charges per call using the [x402](https://docs.x
 
 ### Endpoints
 
-Three execution-fee endpoints. Each is self-contained in its own route file — the logic is
+Three gateway-fee endpoints. Each is self-contained in its own route file — the logic is
 the same, only the price differs:
 
 | Endpoint | Price | Fee for |
 | --- | --- | --- |
-| `GET /api/send-token` | `$0.01` | ERC-20 token transfer |
-| `GET /api/send-native` | `$0.02` | Native coin transfer |
-| `GET /api/send-nft` | `$0.03` | NFT (ERC-721/1155) transfer |
+| `GET /api/send-token` | `$0.01` | ERC-20 token dispatch |
+| `GET /api/send-native` | `$0.02` | Native coin dispatch |
+| `GET /api/send-nft` | `$0.03` | NFT (ERC-721/1155) dispatch |
 
 Each returns `{ "status": "ok" }` once the payment settles — the caller then broadcasts
-the transfer itself. These endpoints **never touch the chain** and take no transfer
-details: the wallet builds, signs and broadcasts the send.
+the action itself. These endpoints **never touch the chain** and take no transfer
+details: the wallet builds, signs and broadcasts the dispatch.
 
 ## How it works
 
@@ -34,7 +34,7 @@ with `createX402Server` from the Coinbase CDP SDK:
    response header** — base64-encoded JSON — and the body is empty. That header, not the
    body, is where x402 v2 puts them.
 2. The client signs a USDC payment and retries with an `X-PAYMENT` header.
-3. The CDP facilitator verifies + settles the payment, then the handler runs and returns
+3. The Coinbase CDP facilitator verifies + settles the payment, then the handler runs and returns
    its result.
 
 Prices and networks live in the route map in `lib/x402.ts`, keyed by `"METHOD /path"` —
@@ -129,9 +129,9 @@ fix anything in `failedDetails` and re-register.
 
 ## Files
 
-- `lib/x402.ts` — CDP-backed resource server + the route map (price, network, payout address); single source of truth for the prices (`PRICES_USD`)
-- `app/api/send-token/route.ts` — the paid ERC-20 transfer fee endpoint ($0.01)
-- `app/api/send-native/route.ts` — the paid native transfer fee endpoint ($0.02)
-- `app/api/send-nft/route.ts` — the paid NFT transfer fee endpoint ($0.03)
+- `lib/x402.ts` — Coinbase CDP-backed resource server + the route map (price, network, payout address); single source of truth for the prices (`PRICES_USD`)
+- `app/api/send-token/route.ts` — the paid ERC-20 dispatch fee endpoint ($0.01)
+- `app/api/send-native/route.ts` — the paid native dispatch fee endpoint ($0.02)
+- `app/api/send-nft/route.ts` — the paid NFT dispatch fee endpoint ($0.03)
 - `app/openapi.json/route.ts` — OpenAPI discovery document for x402scan
 - `app/page.tsx` — landing page describing the endpoints
