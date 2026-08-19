@@ -143,7 +143,7 @@ const config = Object.fromEntries(
       },
       description: DESCRIPTIONS[name],
       extensions: bazaarDeclaration(),
-      resource: DOMAIN,
+      resource: `${DOMAIN}/api/${name}`,
     },
   ]),
 );
